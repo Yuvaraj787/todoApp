@@ -23,6 +23,7 @@ app.get('/',(req,res)=> {
     res.sendFile(__dirname + "/login.html");
 })
 app.post("/showlist",function(req,res) {
+    mongoose.disconnect();
     var lname = req.body.lname;
     var pass = req.body.pass;
     u = lname;
