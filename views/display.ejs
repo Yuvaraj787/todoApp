@@ -1,0 +1,32 @@
+<%- include("head") %>
+<body>
+    <h1 style="color:rgb(31, 54, 52) ;">Hi <%= uname %>!</h1>
+    <div style="border:2px solid black; display:inline-block; padding:50px; border-radius:10px 15px; padding-top:10px; text-align:center">
+        <div><% if  (NameOfDay == "Sunday" || NameOfDay == "Saturday") {  %>
+    <h1 style="color: rgb(42, 199, 42); margin-top:0"><%= NameOfDay %></h1> <h2>Today's List</h2>
+    <% } else {%>
+    <h1 style="color:rgb(135, 71, 11); display:inline-block;"><%= NameOfDay %></h1> <h2>Todays List</h2>
+    <% } %>
+        <% if (newItem.length == 0) { %> 
+        <h3>Hey <%= uname %> Nothing to do?<br>Add some tasks</h3>
+        <% } %>
+        <% for (var i = 0; i < newItem.length ;i++) { %>
+            <div style="display: inline-block; border:1px solid grey; margin-left:0; 
+            width: 150px; text-align:left; padding-left:40px">
+            <form action="/finish" method="post">
+                <br>
+                <input type="checkbox" class="che" name="in" onChange="this.form.submit()" value="<%= newItem[i][0] %>" />
+                <span> 
+                </form>
+                <%= newItem[i][1]; %>
+                    </span><br></div><br>
+        <% }  %>
+                </div>
+<hr style="border: 2px solid black; margin:30px 30px">
+    <form action="/lists<%= pagename %>" method="post">
+        <div class="box"><input type="text" name="item" placeholder="Add new task">
+        <input type="submit" value="+"></div>
+    </form>
+</div>
+<script src="maintain.js"></script>
+<%- include("foot") %>
