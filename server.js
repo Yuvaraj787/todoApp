@@ -89,7 +89,7 @@ app.post("/create",async (req,res)=> {
      })
     await newUser.save();
     usernames.push(un);
-    passwords.push(pass);
+    passwords.push(pas);
     await mongoose.disconnect();
     newOne = true;
     res.redirect("/login");
@@ -145,6 +145,6 @@ app.post("/lists",async function(req,res) {
 app.get("/about",function(req,res) {
     res.render('about.ejs');
 })
-app.listen(process.env.PORT,function() {
+app.listen(process.env.PORT || 3000,function() {
     console.log('server is running boss');
 })
