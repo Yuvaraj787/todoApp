@@ -145,6 +145,6 @@ app.post("/lists",async function(req,res) {
 app.get("/about",function(req,res) {
     res.render('about.ejs');
 })
-app.listen(3000,function() {
+app.listen(process.env.PORT,function() {
     console.log('server is running boss');
 })
