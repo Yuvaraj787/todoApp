@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyparser = require('body-parser');
+const convertcase = require("js-convert-case");
 const app = express();
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
@@ -62,7 +63,7 @@ app.get('/login',(req,res)=> {
     res.render('login.ejs',{uerr:notexit,perr:incorrect,msg:newOne})
 })
 app.post('/verify',async (req,res)=>{
-    var uname = req.body.una;
+    var uname = convertcase.toHeaderCase(req.body.una);
     var pass = req.body.pass;
     if (usernames.includes(uname)) {
         var i = usernames.indexOf(uname);
@@ -82,7 +83,7 @@ app.post('/verify',async (req,res)=>{
 app.post("/create",async (req,res)=> {
     db_disconnect("while creating new account").then(()=>{
     conn_to_db("passwords").then(async ()=>{
-     var un = req.body.lname;
+     var un = convertcase.toHeaderCase(req.body.lname);
      u = un;
      var pas = req.body.pass;
      if (usernames.includes(un)) {
