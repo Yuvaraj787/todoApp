@@ -8,7 +8,7 @@
     <title>Sign Up</title>
 </head>
 <style>
-    #war {
+    #war,.errms,#limit {
         color:red; 
         display:none
     }
@@ -22,10 +22,11 @@
             <% if (err) { %>
             <span style="color: red;">Username already exist</span>              
             <% } %>
-            <input type="text" class="form-control" name="lname" required>
+            <span id="spec" class="errms">Please Do not use special characters on Username</span>
+            <input type="text" id="nn" class="form-control" name="lname" required>
         </div>
         <div class="row mb-3">
-            <p class="font-weight-bold">Set Password</p>
+            <span class="font-weight-bold">Set Password</span><span id="limit">The password must contains atleast 8 characters</span>
             <input type="password" class="form-control" name="pass" id="sp" required>
         </div>
         <div class="row mb-3">
@@ -33,23 +34,51 @@
             <input type="password" class="form-control" name="cpass" id="cp" required>
         </div>
         <div class="mb-3">
-            <input type="submit" class="btn btn-success" value="Create/Show List" onclick="return validate()">
+            <input type="submit" class="btn btn-success" value="Create List" onclick="return validate()">
         </div>
     </form>
-    <span>Already have an account?</span><a href="/login">Login here.</a>
+    <span>Already have an account? </span><a href="/login">Login here.</a>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
 </div>
 </body>
 <script>
     function validate() {
+    const exp = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+    var usern = document.querySelector("#nn").value;
     var pass  = document.querySelector("#sp").value;
     var cpass = document.querySelector("#cp").value;
+    var serr = false;
+    var lerr = false;
+    var cerr = false;
+    if (exp.test(usern)) {
+         document.querySelector("#spec").style.display = "block";
+         serr = true
+    } else {
+        document.querySelector("#spec").style.display = "none"; 
+        serr = false
+    }
+    if (pass.length < 8) {
+        document.querySelector("#limit").style.display = "block";
+        lerr = true
+    } else {
+        document.querySelector("#limit").style.display = "none";
+        lerr = false
+    }
     if (pass == cpass) {
         document.querySelector("#war").style.display = "none";
-        return true;
+        cerr = false
     } else {
         document.querySelector("#war").style.display = "block";
-        return false;
+        cerr = true
+    }
+    
+    console.log( "limit:"+lerr )
+    console.log( "spec:"+ serr )
+    console.log( "cerr:"+ cerr )
+    if (lerr || perr || cerr) {
+        return false
+    } else {
+        return true
     }
 }
 </script>

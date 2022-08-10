@@ -5,11 +5,18 @@ const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 app.use(bodyparser.urlencoded({extended:true}));
 const mongoose = require("mongoose");
-function conn_to_db(na) {
-    mongoose.connect("mongodb+srv://itsyuvi:test123@cluster0.hj8tf4h.mongodb.net/"+na+"?retryWrites=true&w=majority", {
+async function conn_to_db(na) {
+    await mongoose.connect("mongodb+srv://itsyuvi:test123@cluster0.hj8tf4h.mongodb.net/"+na+"?retryWrites=true&w=majority", {
         useNewUrlParser: true,
         useUnifiedTopology: true
-    }).then(() => console.log('mongo connected')).catch(err => console.log(err)); 
+    }).then(() => console.log('mongo connected')).catch(err => console.log("error in connnecting to db named :"+na+"  reason: "+err.message)); 
+}
+async function db_disconnect(position) {
+    try {
+      await  mongoose.disconnect()
+    } catch(err) {
+        console.log("Error happened in database while disconnecct in "+ position)
+    }
 }
 conn_to_db("passwords");
 var usernames = [];
@@ -54,15 +61,14 @@ app.get('/',function(req,res) {
 app.get('/login',(req,res)=> {
     res.render('login.ejs',{uerr:notexit,perr:incorrect,msg:newOne})
 })
-app.post('/verify',(req,res)=>{
+app.post('/verify',async (req,res)=>{
     var uname = req.body.una;
     var pass = req.body.pass;
     if (usernames.includes(uname)) {
         var i = usernames.indexOf(uname);
-        console.log(i);
         if (pass == passwords[i]) {
-            conn_to_db(uname)
-            res.cookie("username",uname);
+            db_disconnect("While verifying login details")
+            res.cookie("username", uname);
             res.redirect("/lists");
         } else {
             incorrect = true;
@@ -74,8 +80,8 @@ app.post('/verify',(req,res)=>{
     }
 })
 app.post("/create",async (req,res)=> {
-    mongoose.disconnect();
-    conn_to_db("passwords");
+    db_disconnect("while creating new account").then(()=>{
+    conn_to_db("passwords").then(async ()=>{
      var un = req.body.lname;
      u = un;
      var pas = req.body.pass;
@@ -90,19 +96,21 @@ app.post("/create",async (req,res)=> {
     await newUser.save();
     usernames.push(un);
     passwords.push(pas);
-    await mongoose.disconnect();
+    db_disconnect("after creating new account")
     newOne = true;
     res.redirect("/login");
     }
 })
-app.get('/lists',function(req,res) {
-    mongoose.disconnect();
+})
+})
+app.get('/lists',async function(req,res) {
+    // db_disconnect("while getting lists")
     var lists = [];
-    conn_to_db(req.cookies.username);
-    Work.find({},function(err,docs) {
+    conn_to_db(req.cookies.username).then(()=>{
+    Work.find({},async function(err,docs) {
         lists = [];
         if (err) {
-            console.log("error is happening"); 
+            console.log("error is happening:"+err.message); 
         } else {
             docs.forEach(w => {
                 console.log("first");
@@ -114,16 +122,20 @@ app.get('/lists',function(req,res) {
     res.render("display.ejs",{NameOfDay: curDay(),newItem: lists, pagename: "",uname:req.cookies.username});
     })    
 })
+})
 app.post("/finish",function(req,res) {
+    db_disconnect("while deleting").then(()=>{
     var ic = Number(req.body.in);
-    conn_to_db(req.cookies.username);
+    conn_to_db(req.cookies.username).then(()=>{
     Work.deleteOne({_id:ic},function(err) {
         if (! err) {
             console.log("deleted")
         }
     lists = [];
     res.redirect("/lists");
-    })    
+    })
+})    
+})
 });
 app.get("/logout",(req,res)=>{
     res.clearCookie("username");
